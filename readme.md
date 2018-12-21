@@ -20,33 +20,51 @@
 	3. callbackurl  		(URIs beginning with "https")
 	4. oauth_clients     		(client id)
 	5. oauth_client_secret		(client secret)
-	5. oauth_refresh_token  	(state value)
+	5. oauth_state_token  	        (state value)
       	6. grant_types                  (different use cases)
+	7. access_token
+
 
 // after apps register return client secret & token
 
- 3. Create login button like:
- 
-    https://example-app.com/cb?code=oauth_auth_codes&state=1234zyx
- 
-    After login gives a confirmation message If the user clicks "Allow," 
-    the service redirects the user back to your site with an auth code.
+3. Create login with button like:
     
-    code - The server returns the authorization code in the query string from oauth_auth_codes column
-    state - The server returns the same state value that you passed
+    <a href="https://example-app.com/authLogin">Login with me</a>
 
- 4. First compare this state value with database oauth_refresh_token.
-    2nd compare this state value with database oauth_client_secret.
+// show this form after click:    
+
+4. 
+    <form action="{{ url('www.externalWeb.com/AuthloginCheck') }}" method="post">
+       {{ csrf_field() }}
+	user<input type="text" name="username">
+	pass<input type="text" name="password">
+	<input type="submit" name="submit">
+    </form>
+
+// pass access_token & state in compact after success login in grant page
+
+5. In grant page:
+
+    Do you really want to give permission this app
+   
+    <a href="{{ url('www.internalWeb.com/grant_permission?state=1234&access_token=34324343') }}">OK</a>
     
- 5. if ok send this request:
-    POST https://api.authorization-server.com/token
+ 4. // after grant_permission fetch website name from database
+    // redirect in client app with oauth_access_tokens token , state 
+    
+    $access_token = $_GET['access_token'];
+    return redirect("http://localhost/ClientApp/public/grantPermission?bearer_token=$oauth_access_tokens&state=1234");
+    
+    
+ 5. now in client if get data in grantPermission route,
+    set header with all that value send final value:
+      
+      POST https://api.authorization-server.com/token
 	  grant_type=authorization_code&
 	  code=AUTH_CODE_HERE&
 	  redirect_uri=REDIRECT_URI&
 	  client_id=CLIENT_ID&
 	  client_secret=CLIENT_SECRET
-	  
-
 	
     grant_type		= authorization_code - The grant type for this flow is authorization_code
     code		= AUTH_CODE_HERE - This is the code you received in the query string
@@ -54,7 +72,7 @@
     client_id		= CLIENT_ID - The client ID you received when you first created the application
     client_secret	= CLIENT_SECRET - Since this request is made from server-side code, the secret is included
 
- 4. The server replies with an access token and expiration time
+ 4. The auth server replies with an access token and expiration time
     
      {
 	  "access_token":"RsT5OjbzRn430zqMLgV3Ia",
