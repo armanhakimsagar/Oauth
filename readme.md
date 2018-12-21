@@ -1,6 +1,6 @@
-1. register user
-2. register apps
-      -> users:
+1. register user panel
+
+-> users:
 
     1. username
     2. password
@@ -11,30 +11,32 @@
     7. phone
     8. oauth_access_tokens (at last if access token match send data)
     
-3. The Authorization Server:
-	-> oauth_clients:
+2. register apps panel
+
+-> oauth_clients:
 	
 	1. empUserId 
 	2. website_name 
-	3. callbackurl  		      (URIs beginning with "https")
+	3. callbackurl  		(URIs beginning with "https")
 	4. oauth_clients     		(client id)
 	5. oauth_client_secret		(client secret)
-	5. oauth_refresh_token  	(send to apps after client accept request)
-      	6. grant_types                (different use cases)
+	5. oauth_refresh_token  	(state value)
+      	6. grant_types                  (different use cases)
 
-	
- 3. After login gives a confirmation message If the user clicks "Allow," the service redirects the user back to your site 
-    with an auth code
-    
+// after apps register return client secret & token
+
+ 3. Create login button like:
+ 
     https://example-app.com/cb?code=oauth_auth_codes&state=1234zyx
-    
+ 
+    After login gives a confirmation message If the user clicks "Allow," 
+    the service redirects the user back to your site with an auth code.
     
     code - The server returns the authorization code in the query string from oauth_auth_codes column
     state - The server returns the same state value that you passed
 
- 4. You should first compare this state value to ensure it matches the one you started with.
-    You can typically store the state value in a cookie or session, and compare it when the user comes back.
-    This ensures your redirection endpoint isn't able to be tricked into attempting to exchange arbitrary authorization codes.
+ 4. First compare this state value with database oauth_refresh_token.
+    2nd compare this state value with database oauth_client_secret.
     
  5. if ok send this request:
     POST https://api.authorization-server.com/token
