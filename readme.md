@@ -22,7 +22,6 @@
 	5. oauth_client_secret		(client secret)
 	5. oauth_state_token  	        (state value)
       	6. grant_types                  (different use cases)
-	7. access_token
 
 
 // after apps register return client secret & token
@@ -59,18 +58,22 @@
  5. now in client if get data in grantPermission route,
     set header with all that value send final value:
       
-      POST https://api.authorization-server.com/token
-	  grant_type=authorization_code&
-	  code=AUTH_CODE_HERE&
-	  redirect_uri=REDIRECT_URI&
-	  client_id=CLIENT_ID&
-	  client_secret=CLIENT_SECRET
-	
-    grant_type		= authorization_code - The grant type for this flow is authorization_code
-    code		= AUTH_CODE_HERE - This is the code you received in the query string
-    redirect_uri	= REDIRECT_URI - Must be identical to the redirect URI provided in the original link
-    client_id		= CLIENT_ID - The client ID you received when you first created the application
-    client_secret	= CLIENT_SECRET - Since this request is made from server-side code, the secret is included
+    public function ApiToken(){
+    	$token = $_GET['access_token'];
+    	$client = new Client(['http_errors' => false]);
+		// set all information get from database
+		$allresponse = $client->request('GET','http://localhost/extarnal/public/token_response', [
+		    'headers' => [
+				'oauth_clients' 		=> "32432432423",
+				'oauth_client_secret' 	=> "32432432423",
+				'oauth_access_tokens' 	=> "32432432423",
+				'grant_types' 			=> "32432432423",
+		    ]
+		]);
+		$allbody = $allresponse->getBody();
+		$all_list = json_decode($allbody->getContents());
+		dd($all_list);
+    }
 
  4. The auth server replies with an access token and expiration time
     
@@ -80,3 +83,4 @@
      }
 
 
+5. last bring data against access token
